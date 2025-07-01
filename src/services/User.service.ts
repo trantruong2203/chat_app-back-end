@@ -1,45 +1,135 @@
-import { User } from "../models/User.model";
-import { db } from '../config/db';
+import * as Account from '../models/User.model';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+const SECRET = "000765776474";
 
-export const getAllUsers = async (): Promise<User[]> => {
-    const [results] = await db.query('SELECT * FROM user');
-    return results as User[];
+export const getAllUsers = () => {
+    return new Promise ((resolve, reject) => {
+        Account.getAllUsers()
+            .then((results: any) => {
+                resolve(results);
+            })
+            .catch((err: any) => {
+                reject(err);
+            });
+    });
 };
 
-export const getUserById = async (id: number): Promise<User[]> => {
-    const [results] = await db.query('SELECT * FROM user WHERE id = ?', [id]);
-    return results as User[];
+export const getUserByAccount = (account: string) => {
+  return new Promise((resolve, reject) => {
+    Account.getUserById(account)
+      .then((results: any) => {
+        resolve(results);
+      })
+      .catch((err: any) => {
+        reject(err);
+      });
+  });
 };
 
-export const createUser = async (id: number, username: string, birthday: Date, avatar: string, password: string, status: boolean, phone: number, email: string, createat: Date): Promise<any> => {
-    const [results] = await db.query('INSERT INTO user (id, username, birthday, avatar, password, status, phone, email, createat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [id, username, birthday, avatar, password, status, phone, email, createat]);
-    return (
-        {
-            success: true,
-            message: 'User created successfully',
-            data: results
-        }
-    )
+
+export const login = (email: string, password: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await Account.getUserById(email);
+      if (results.length === 0) return reject({ status: 401, message: 'email không tồn tại' });
+
+      const user = results[0];
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return reject({ status: 401, message: 'Sai mật khẩu' });
+
+      const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '2h' });
+      resolve({ 
+        message: 'Đăng nhập thành công', 
+        token,
+        email: user.email,
+        phone: user.phone,
+        birthday: user.birthday
+      });
+    } catch (err) {
+      reject({ status: 500, message: 'Lỗi truy vấn', error: err });
+    }
+  });
 };
 
-export const updateUser = async (id: number, username: string, birthday: Date, avatar: string, password: string, status: boolean, phone: number, email: string, createat: Date): Promise<any> => {
-    const [results] = await db.query('UPDATE user SET username = ?, birthday = ?, avatar = ?, password = ?, status = ?, phone = ?, email = ?, createat = ? WHERE id = ?', [username, birthday, avatar, password, status, phone, email, createat, id]);
-    return (
-        {
-            success: true,
-            message: 'User updated successfully',
-            data: results
-        }
-    )
+export const createUser = async (username: string, password: string, email: string, phone: string, birthday: string, avatar: string) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await Account.createUser(
+        username,
+        new Date(birthday),
+        avatar,
+        hashedPassword,
+        phone,
+        email,
+        new Date()
+      );
+      resolve({ message: 'Đăng ký thành công', id: result.data.insertId });
+    } catch (err: any) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return reject({ status: 400, message: 'email đã tồn tại' });
+      }
+      return reject({ status: 500, message: 'Lỗi server khi tạo tài khoản', error: err });
+    }
+  });
 };
 
-export const deleteUser = async (id: number): Promise<any> => {
-    const [results] = await db.query('DELETE FROM user WHERE id = ?', [id]);
-    return (
-        {
-            success: true,
-            message: 'User deleted successfully',
-            data: results
-        }
-    )
+export const updateUser = async (email: string, password: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Lấy thông tin người dùng hiện tại
+      const user = await Account.getUserById(email);
+      if (!user || user.length === 0) {
+        return reject({ status: 404, message: 'Không tìm thấy người dùng' });
+      }
+      
+      // Mã hóa mật khẩu mới
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Cập nhật thông tin người dùng (giữ nguyên các thông tin khác)
+      const currentUser = user[0];
+      if (currentUser.id === undefined) {
+        return reject({ status: 400, message: 'ID người dùng không hợp lệ' });
+      }
+      
+      const result = await Account.updateUser(
+        currentUser.id,
+        currentUser.username,
+        currentUser.birthday,
+        currentUser.avatar,
+        hashedPassword, // Cập nhật mật khẩu mới
+        currentUser.phone,
+        currentUser.email,
+        currentUser.createat
+      );
+      
+      resolve({ message: 'Cập nhật người dùng thành công', data: result });
+    } catch (err: any) {
+      reject({ status: 500, message: 'Lỗi khi cập nhật người dùng', error: err });
+    }
+  });
+};
+
+export const deleteUser = async (email: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Lấy thông tin người dùng để lấy ID
+      const user = await Account.getUserById(email);
+      if (!user || user.length === 0) {
+        return reject({ status: 404, message: 'Không tìm thấy người dùng' });
+      }
+      
+      if (user[0].id === undefined) {
+        return reject({ status: 400, message: 'ID người dùng không hợp lệ' });
+      }
+      
+      // Xóa người dùng theo ID
+      const result = await Account.deleteUser(user[0].id);
+      resolve({ message: 'Xóa người dùng thành công', data: result });
+    } catch (err: any) {
+      reject({ status: 500, message: 'Lỗi khi xóa người dùng', error: err });
+    }
+  });
 };

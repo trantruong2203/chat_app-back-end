@@ -22,14 +22,6 @@ app.use(express.json());
 
 const port = 3000;
 
-// Middleware xử lý lỗi
-app.use((err: any, req: any, res: any, next: any) => {
-    console.error('Lỗi server:', err);
-    res.status(500).json({
-        error: 'Lỗi server nội bộ',
-        message: err.message || 'Có lỗi xảy ra'
-    });
-});
 
 app.use('/icon', iconRouter);
 app.use('/user', userRouter);

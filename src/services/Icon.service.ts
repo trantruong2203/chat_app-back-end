@@ -35,3 +35,5 @@ export const getIconByIcon = async (icon: string) => {
   const [results] = await db.query('SELECT * FROM icon WHERE icon = ?', [icon]);
   return results as Icon[];
 };
+
+// gui yeu request => middleware(filter) => controller (dieu khien) => service (xu ly) => model (ket noi csdl)

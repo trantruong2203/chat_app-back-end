@@ -5,4 +5,4 @@ export interface ChatGroup {
     creatorid: number;
     createdat: Date;
     status: boolean;
-}
+};

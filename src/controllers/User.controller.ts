@@ -1,54 +1,73 @@
-import { Request, Response } from "express";
-import { createUser, deleteUser, getAllUsers, getUserById, updateUser } from "../services/User.service";
+import { NextFunction, Request, Response } from "express";
+import * as UserService from '../services/User.service';
 
 export const getUsersController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllUsers();
+        const data = await UserService.getAllUsers();
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
 };
 
-export const getUserByIdController = async (req: Request, res: Response) => {
+export const getUserByAccountController = async (req: Request, res: Response) => {
+    const {email} = req.params;
     try {
-        const data = await getUserById(parseInt(req.params.id));
-        if (!data || data.length === 0) {
-            return res.status(404).json({message: "User not found"});
-        }
-        res.json(data[0]);
+        const data = await UserService.getUserByAccount(email);
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
-};  
+};
 
+export const loginController = async (req: Request, res: Response, next: NextFunction) => {
+    const {email, password} = req.body;
+   try {
+       const data = await UserService.login(email, password);
+       res.status(200).json(data);
+   } catch (err) {
+       next(err);
+   }
+};
 export const createUserController = async (req: Request, res: Response) => {
-    const { id, username, birthday, avatar, password, status, phone, email, createat } = req.body;
+    const { username, password, email, phone, birthday, avatar } = req.body;
     try {
-        const data = await createUser(id, username, birthday, avatar, password, status, phone, email, createat);
+        const data = await UserService.createUser(username, password, email, phone, birthday, avatar);
         res.status(201).json(data);
-    } catch (error) {
-        res.status(500).json({error});
+    } catch (error: any) {
+        if (error.status) {
+            res.status(error.status).json({error: error.message});
+        } else {
+            res.status(500).json({error});
+        }
     }
 };
 
 export const updateUserController = async (req: Request, res: Response) => {
-    const {id} = req.params;
-    const { username, birthday, avatar, password, status, phone, email, createat } = req.body;
+    const {email} = req.params;
+    const { password } = req.body;
     try {
-        const data = await updateUser(parseInt(id), username, birthday, avatar, password, status, phone, email, createat);
+        const data = await UserService.updateUser(email, password);
         res.status(200).json(data);
-    } catch (error) {
-        res.status(500).json({error});
+    } catch (error: any) {
+        if (error.status) {
+            res.status(error.status).json({error: error.message});
+        } else {
+            res.status(500).json({error});
+        }
     }
 };
 
 export const deleteUserController = async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const {email} = req.params;
     try {
-         const data = await deleteUser(parseInt(id));
+         const data = await UserService.deleteUser(email);
          res.status(204).send();
-    } catch (error) {
-        res.status(500).json({error});
+    } catch (error: any) {
+        if (error.status) {
+            res.status(error.status).json({error: error.message});
+        } else {
+            res.status(500).json({error});
+        }
     }
 };
