@@ -31,17 +31,19 @@ export const createUser = async (username: string, birthday: Date, avatar: strin
     };
 };
 
-export const updateUser = async (id: number, username: string, birthday: Date, avatar: string, password: string, phone: string, email: string, createat: Date): Promise<any> => {
-    const [results] = await db.query('UPDATE user SET username = ?, birthday = ?, avatar = ?, password = ?, phone = ?, email = ?, createat = ? WHERE id = ?', [username, birthday, avatar, password, phone, email, createat, id]);
+export const updateUser = async (email: string, password: string): Promise<any> => {
+    const [results] = await db.query(
+        'UPDATE user SET password = ? WHERE email = ?',
+        [password, email]
+    );
     return {
         success: true,
         message: 'User updated successfully',
         data: results
     };
 };
-
-export const deleteUser = async (id: number): Promise<any> => {
-    const [results] = await db.query('DELETE FROM user WHERE id = ?', [id]);
+export const deleteUser = async (email: string): Promise<any> => {
+    const [results] = await db.query('DELETE FROM user WHERE email = ?', [email]);
     return {
         success: true,
         message: 'User deleted successfully',

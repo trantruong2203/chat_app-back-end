@@ -90,19 +90,10 @@ export const updateUser = async (email: string, password: string) => {
       
       // Cập nhật thông tin người dùng (giữ nguyên các thông tin khác)
       const currentUser = user[0];
-      if (currentUser.id === undefined) {
-        return reject({ status: 400, message: 'ID người dùng không hợp lệ' });
-      }
       
       const result = await Account.updateUser(
-        currentUser.id,
-        currentUser.username,
-        currentUser.birthday,
-        currentUser.avatar,
-        hashedPassword, // Cập nhật mật khẩu mới
-        currentUser.phone,
-        currentUser.email,
-        currentUser.createat
+        email,
+        hashedPassword
       );
       
       resolve({ message: 'Cập nhật người dùng thành công', data: result });
@@ -121,12 +112,8 @@ export const deleteUser = async (email: string) => {
         return reject({ status: 404, message: 'Không tìm thấy người dùng' });
       }
       
-      if (user[0].id === undefined) {
-        return reject({ status: 400, message: 'ID người dùng không hợp lệ' });
-      }
-      
       // Xóa người dùng theo ID
-      const result = await Account.deleteUser(user[0].id);
+      const result = await Account.deleteUser(email);
       resolve({ message: 'Xóa người dùng thành công', data: result });
     } catch (err: any) {
       reject({ status: 500, message: 'Lỗi khi xóa người dùng', error: err });
