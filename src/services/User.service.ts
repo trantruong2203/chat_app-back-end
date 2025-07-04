@@ -41,10 +41,7 @@ export const login = (email: string, password: string) => {
       const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '2h' });
       resolve({ 
         message: 'Đăng nhập thành công', 
-        token,
-        email: user.email,
-        phone: user.phone,
-        birthday: user.birthday
+        token
       });
     } catch (err) {
       reject({ status: 500, message: 'Lỗi truy vấn', error: err });
@@ -90,6 +87,7 @@ export const updateUser = async (email: string, password: string) => {
       
       // Cập nhật thông tin người dùng (giữ nguyên các thông tin khác)
       const currentUser = user[0];
+      
       
       const result = await Account.updateUser(
         email,
