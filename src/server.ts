@@ -12,15 +12,20 @@ import commentRouter from './routers/Comment.router';
 import postRouter from './routers/Post.router';
 import favoritePostRouter from './routers/FavoritePost.router';
 import postImageRouter from './routers/PostImage.router';
+import cookieParser from 'cookie-parser';
 
 const app = express();
-
-// Cấu hình CORS cho phép tất cả origins và headers
-app.use(cors());
-
-app.use(express.json());
-
 const port = 3000;
+// Bắt buộc để parse JSON body từ request
+app.use(express.json());
+// 🧠 Cấu hình CORS cho phép gửi cookie
+app.use(cors({
+  origin: 'http://localhost:5173', // frontend domain
+  credentials: true
+}));
+
+// 🧠 Cho phép đọc cookie từ request
+app.use(cookieParser());
 
 
 app.use('/icon', iconRouter);

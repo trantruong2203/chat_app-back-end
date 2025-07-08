@@ -31,17 +31,28 @@ export const createUser = async (username: string, birthday: Date, avatar: strin
     };
 };
 
-export const updateUser = async (email: string, password: string): Promise<any> => {
-    const [results] = await db.query(
-        'UPDATE user SET password = ? WHERE email = ?',
-        [password, email]
-    );
-    return {
-        success: true,
-        message: 'User updated successfully',
-        data: results
-    };
-};
+export const updateUserDynamic = async (email: string, fieldsToUpdate: Partial<{ 
+    username: string, 
+    birthday: Date,  
+    gender: string,
+    phone: string,
+    avatar: string
+  }>) => {
+    const keys = Object.keys(fieldsToUpdate);
+    if (keys.length === 0) {
+      throw new Error('Không có thông tin nào để cập nhật');
+    }
+  
+    const setClause = keys.map(key => `${key} = ?`).join(', ');
+    const values = keys.map(key => (fieldsToUpdate as any)[key]);
+  
+    const query = `UPDATE user SET ${setClause} WHERE email = ?`;
+    const [result] = await db.query(query, [...values, email]);
+  
+    return result;
+  };
+  
+  
 export const deleteUser = async (email: string): Promise<any> => {
     const [results] = await db.query('DELETE FROM user WHERE email = ?', [email]);
     return {
@@ -50,3 +61,5 @@ export const deleteUser = async (email: string): Promise<any> => {
         data: results
     };
 };
+
+

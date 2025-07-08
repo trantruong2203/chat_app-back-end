@@ -4,15 +4,15 @@ import * as jwt from 'jsonwebtoken';
 const SECRET = "000765776474";
 
 export const getAllUsers = () => {
-    return new Promise ((resolve, reject) => {
-        Account.getAllUsers()
-            .then((results: any) => {
-                resolve(results);
-            })
-            .catch((err: any) => {
-                reject(err);
-            });
-    });
+  return new Promise((resolve, reject) => {
+    Account.getAllUsers()
+      .then((results: any) => {
+        resolve(results);
+      })
+      .catch((err: any) => {
+        reject(err);
+      });
+  });
 };
 
 export const getUserByAccount = (account: string) => {
@@ -37,12 +37,9 @@ export const login = (email: string, password: string) => {
       const user = results[0];
       const match = await bcrypt.compare(password, user.password);
       if (!match) return reject({ status: 401, message: 'Sai mật khẩu' });
-
+      // Tạo token JWT với thời gian hết hạn là 2 giờ
       const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '2h' });
-      resolve({ 
-        message: 'Đăng nhập thành công', 
-        token
-      });
+      resolve({ token });
     } catch (err) {
       reject({ status: 500, message: 'Lỗi truy vấn', error: err });
     }
@@ -73,33 +70,25 @@ export const createUser = async (username: string, password: string, email: stri
   });
 };
 
-export const updateUser = async (email: string, password: string) => {
+export const updateUser = async (
+  email: string,
+  data: Partial<{ username: string, birthday: Date, gender: string, phone: string, avatar: string }>
+) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Lấy thông tin người dùng hiện tại
       const user = await Account.getUserById(email);
       if (!user || user.length === 0) {
         return reject({ status: 404, message: 'Không tìm thấy người dùng' });
       }
-      
-      // Mã hóa mật khẩu mới
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      // Cập nhật thông tin người dùng (giữ nguyên các thông tin khác)
-      const currentUser = user[0];
-      
-      
-      const result = await Account.updateUser(
-        email,
-        hashedPassword
-      );
-      
-      resolve({ message: 'Cập nhật người dùng thành công', data: result });
+
+      const result = await Account.updateUserDynamic(email, data);
+      resolve({ message: 'Cập nhật thành công', data: result });
     } catch (err: any) {
-      reject({ status: 500, message: 'Lỗi khi cập nhật người dùng', error: err });
+      reject({ status: 500, message: 'Lỗi cập nhật', error: err });
     }
   });
 };
+
 
 export const deleteUser = async (email: string) => {
   return new Promise(async (resolve, reject) => {
@@ -109,7 +98,7 @@ export const deleteUser = async (email: string) => {
       if (!user || user.length === 0) {
         return reject({ status: 404, message: 'Không tìm thấy người dùng' });
       }
-      
+
       // Xóa người dùng theo ID
       const result = await Account.deleteUser(email);
       resolve({ message: 'Xóa người dùng thành công', data: result });
@@ -118,3 +107,4 @@ export const deleteUser = async (email: string) => {
     }
   });
 };
+
