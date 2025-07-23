@@ -1,7 +1,6 @@
-import { createUserController, deleteUserController, getCurrentUser, getUsersController, loginController, logoutController, processUserUpdate, updateUserController, updateUserWithAvatarController } from "../controllers/User.controller";
+import { createUserController, deleteUserController, getCurrentUser, getUserByAccountController, getUsersController, loginController, logoutController, updatePasswordController, updateUserController, uploadAvatar } from "../controllers/User.controller";
 import { Router } from 'express';
 import { authMiddleware } from "../middlewares/auth.middlewares";
-import { uploadAvatar } from "../controllers/Cloudinary.controller";
 
 const router = Router();
 
@@ -15,12 +14,10 @@ router.use(authMiddleware);
 // Route cần xác thực
 router.get('/', getUsersController);
 router.get('/me', getCurrentUser);
+router.put('/update-avatar', uploadAvatar);
 router.patch('/update/:email', updateUserController);
 router.delete('/delete/:email', deleteUserController);
 router.post('/logout', logoutController);
-router.post('/upload-avatar', uploadAvatar);
-
-// API mới kết hợp cập nhật thông tin và upload avatar
-router.patch('/update-with-avatar/:email', updateUserWithAvatarController, processUserUpdate);
+router.put('/update-password/:email', updatePasswordController);
 
 export default router;

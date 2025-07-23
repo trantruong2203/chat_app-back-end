@@ -1,27 +1,60 @@
-import { FriendShip } from "../models/FriendShip.model";
-import { db } from "../config/db";
+import { getAllFriendShip, getFriendShipById, createFriendShip, updateFriendShip, deleteFriendShip } from "../models/FriendShip.model";
+import { FriendShip } from "../types/interface";
 
-export const getAllFriendShips = async (): Promise<FriendShip[]> => {
-    const [results] = await db.query('SELECT * FROM friendship');
-    return results as FriendShip[];
+export const getAllFriendShips = () => {
+    return new Promise((resolve, reject) => {
+      getAllFriendShip()
+        .then((results: any) => {
+          resolve(results);
+        })
+        .catch((err: any) => {
+          reject(err);
+        });
+    });
+  };
+
+export const getFriendShipByIdService = async (id: number): Promise<FriendShip[]> => {
+    return new Promise((resolve, reject) => {
+        getFriendShipById(id)
+          .then((results: any) => {
+            resolve(results);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      });
 };
 
-export const getFriendShipById = async (id: number): Promise<FriendShip[]> => {
-    const [results] = await db.query('SELECT * FROM friendship WHERE id = ?', [id]);
-    return results as FriendShip[];
+export const createFriendShipService = async (userid: number, sentat: number, status: boolean): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+       try {
+        const results = await createFriendShip(userid, sentat, status);
+        resolve({message: 'Friendship created successfully', data: {userid, sentat, status, id: results.insertId}});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };
 
-export const createFriendShip = async (id: number, userid: number, sentat: Date, status: boolean): Promise<FriendShip[]> => {
-    const [results] = await db.query('INSERT INTO friendship (id, userid, sentat, status) VALUES (?, ?, ?, ?)', [id, userid, sentat, status]);
-    return results as FriendShip[];
+export const updateFriendShipService = async (id: number, userid: number, sentat: string, status: number): Promise<any> => {
+  console.log(`Updating friendship with ID: ${id}, UserID: ${userid}, SentAt: ${sentat}, Status: ${status}`);
+    return new Promise(async (resolve, reject) => {
+       try {
+          await updateFriendShip(id, userid, sentat, status);
+        resolve({message: `Friendship updated successfully ${id}`, data : {id, userid, sentat, status }});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };
 
-export const updateFriendShip = async (id: number, userid: number, sentat: Date, status: boolean): Promise<FriendShip[]> => {
-    const [results] = await db.query('UPDATE friendship SET userid = ?, sentat = ?, status = ? WHERE id = ?', [userid, sentat, status, id]);
-    return results as FriendShip[];
-};
-
-export const deleteFriendShip = async (id: number): Promise<FriendShip[]> => {
-    const [results] = await db.query('DELETE FROM friendship WHERE id = ?', [id]);
-    return results as FriendShip[];
+export const deleteFriendShipService = async (id: number): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+       try {
+        const results = await deleteFriendShip(id);
+        resolve({message: 'Friendship deleted successfully', data: results.data.affectedRows});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };

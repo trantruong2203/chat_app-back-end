@@ -1,16 +1,7 @@
 import { db } from "../config/db";
+import { User } from "../types/interface";
 
-export interface User {
-    id?: number;
-    username: string;
-    avatar: string;
-    email: string;
-    password: string;
-    status: boolean;
-    birthday: Date;
-    createat: Date;
-    phone: string;
-};
+
 
 export const getAllUsers = async (): Promise<User[]> => {
     const [results] = await db.query('SELECT * FROM user');
@@ -22,8 +13,8 @@ export const getUserById = async (email: string): Promise<User[]> => {
     return results as User[];
 };
 
-export const createUser = async (username: string, birthday: Date, avatar: string, password: string, phone: string, email: string, createat: Date): Promise<any> => {
-    const [results] = await db.query('INSERT INTO user (username, birthday, avatar, password, phone, email, createat) VALUES (?, ?, ?, ?, ?, ?, ?)', [username, birthday, avatar, password, phone, email, createat]);
+export const createUser = async (username: string, password: string, birthday: Date, avatar: string, phone: string, email: string, createat: Date): Promise<any> => {
+    const [results] = await db.query('INSERT INTO user (username, password, birthday, avatar, phone, email, createat) VALUES (?, ?, ?, ?, ?, ?, ?)', [username, password, birthday, avatar, phone, email, createat]);
     return {
         success: true,
         message: 'User created successfully',
@@ -62,4 +53,20 @@ export const deleteUser = async (email: string): Promise<any> => {
     };
 };
 
+export const updatePassword = async (email: string, password: string): Promise<any> => {
+    const [results] = await db.query('UPDATE user SET password = ? WHERE email = ?', [password, email]);
+    return {
+        success: true,
+        message: 'Password updated successfully',
+        data: results
+    };
+};
 
+export const updateAvatar = async (email: string, avatarUrl: string): Promise<any> => {
+    const [results] = await db.query('UPDATE user SET avatar = ? WHERE email = ?', [avatarUrl, email]);
+    return {
+        success: true,
+        message: 'Avatar updated successfully',
+        data: results
+    };
+};

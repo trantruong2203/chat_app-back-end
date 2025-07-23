@@ -1,7 +1,7 @@
 // middlewares/auth.middleware.ts
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-const SECRET = "000765776474";
+const SECRET = process.env.SECRET;
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
@@ -12,7 +12,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
   try {
     const decoded = jwt.verify(token, SECRET || 'secret');
-    req.user = decoded; // Gắn user vào req
+    req.user = decoded as JwtPayload & { email: string; id?: number | undefined; };
     next();
   } catch (error) {
     res.status(401).json({ message: 'Token không hợp lệ' });

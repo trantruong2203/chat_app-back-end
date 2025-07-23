@@ -1,7 +1,7 @@
 import * as Account from '../models/User.model';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-const SECRET = "000765776474";
+const SECRET = process.env.SECRET;
 
 export const getAllUsers = () => {
   return new Promise((resolve, reject) => {
@@ -28,6 +28,7 @@ export const getUserByAccount = (account: string) => {
 };
 
 
+
 export const login = (email: string, password: string) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -38,7 +39,7 @@ export const login = (email: string, password: string) => {
       const match = await bcrypt.compare(password, user.password);
       if (!match) return reject({ status: 401, message: 'Sai mật khẩu' });
       // Tạo token JWT với thời gian hết hạn là 2 giờ
-      const token = jwt.sign({ email: user.email }, SECRET, { expiresIn: '2h' });
+      const token = jwt.sign({ email: user.email }, SECRET || '', { expiresIn: '2h' });
       resolve({ token });
     } catch (err) {
       reject({ status: 500, message: 'Lỗi truy vấn', error: err });
@@ -47,15 +48,15 @@ export const login = (email: string, password: string) => {
 };
 
 export const createUser = async (username: string, password: string, email: string, phone: string, birthday: string, avatar: string) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
+
 
   return new Promise(async (resolve, reject) => {
     try {
       const result = await Account.createUser(
         username,
+        password,
         new Date(birthday),
         avatar,
-        hashedPassword,
         phone,
         email,
         new Date()
@@ -72,7 +73,7 @@ export const createUser = async (username: string, password: string, email: stri
 
 export const updateUser = async (
   email: string,
-  data: Partial<{ username: string, birthday: Date, gender: string, phone: string, avatar: string }>
+  data: Partial<{ username: string, birthday: Date, gender: string, phone: string }>
 ) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -108,3 +109,24 @@ export const deleteUser = async (email: string) => {
   });
 };
 
+export const updatedPassword = async (email: string, password: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await Account.updatePassword(email, password);
+      resolve({ message: 'Cập nhật mật khẩu thành công', data: result });
+    } catch (err: any) {
+      reject({ status: 500, message: 'Lỗi cập nhật mật khẩu', error: err });
+    }
+  });
+};
+
+export const updatedAvatar = async (email: string, avatarUrl: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await Account.updateAvatar(email, avatarUrl);
+      resolve({ message: 'Cập nhật ảnh đại diện thành công', data: result });
+    } catch (err: any) {
+      reject({ status: 500, message: 'Lỗi cập nhật ảnh đại diện', error: err });
+    }
+  });
+};
