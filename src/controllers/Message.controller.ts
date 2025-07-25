@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { getAllMessages, getMessageById, createMessage, updateMessage, deleteMessage } from "../services/Message.service";
+import { getAllMessagesService, getMessageByIdService, createMessageService, updateMessageService, deleteMessageService } from "../services/Message.service";
 
 export const getAllMessagesController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllMessages();
+        const data = await getAllMessagesService();
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -13,7 +13,7 @@ export const getAllMessagesController = async (req: Request, res: Response) => {
 export const getMessageByIdController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await getMessageById(parseInt(id));
+        const data = await getMessageByIdService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -22,8 +22,8 @@ export const getMessageByIdController = async (req: Request, res: Response) => {
 
 export const createMessageController = async (req: Request, res: Response) => {
     try {
-        const {id, senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
-        const data = await createMessage(id, senderid, receiverid, groupid, content, sentat, status, messageid);
+        const {senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
+        const data = await createMessageService(senderid, receiverid, groupid, content, sentat, status, messageid);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -34,7 +34,7 @@ export const updateMessageController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
         const {senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
-        const data = await updateMessage(parseInt(id), senderid, receiverid, groupid, content, sentat, status, messageid);
+        const data = await updateMessageService(parseInt(id), senderid, receiverid, groupid, content, sentat, status, messageid);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -44,7 +44,7 @@ export const updateMessageController = async (req: Request, res: Response) => {
 export const deleteMessageController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await deleteMessage(parseInt(id));
+        const data = await deleteMessageService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});

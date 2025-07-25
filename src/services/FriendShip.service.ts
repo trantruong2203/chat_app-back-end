@@ -51,8 +51,8 @@ export const updateFriendShipService = async (id: number, userid: number, sentat
 export const deleteFriendShipService = async (id: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
        try {
-        const results = await deleteFriendShip(id);
-        resolve({message: 'Friendship deleted successfully', data: results.data.affectedRows});
+        await deleteFriendShip(id);
+        resolve({message: 'Friendship deleted successfully', data: {id}});
        } catch (err) {
         reject(err);
        }

@@ -24,9 +24,5 @@ export const updateFriendShip = async (id: number, userid: number, sentat: strin
 
 export const deleteFriendShip = async (id: number): Promise<any> => {
     const [results] = await db.query('DELETE FROM friendship WHERE id = ?', [id]);
-    return {
-        success: true,
-        message: 'Friendship deleted successfully',
-        data: results
-    };
+    return results;
 };

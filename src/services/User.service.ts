@@ -48,13 +48,15 @@ export const login = (email: string, password: string) => {
 };
 
 export const createUser = async (username: string, password: string, email: string, phone: string, birthday: string, avatar: string) => {
-
-
   return new Promise(async (resolve, reject) => {
     try {
+      // Mã hóa mật khẩu trước khi lưu vào database
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      
       const result = await Account.createUser(
         username,
-        password,
+        hashedPassword,
         new Date(birthday),
         avatar,
         phone,
@@ -73,7 +75,7 @@ export const createUser = async (username: string, password: string, email: stri
 
 export const updateUser = async (
   email: string,
-  data: Partial<{ username: string, birthday: Date, gender: string, phone: string }>
+  data: Partial<{ username: string, birthday: Date, gender: string, phone: string, status: number }>
 ) => {
   return new Promise(async (resolve, reject) => {
     try {

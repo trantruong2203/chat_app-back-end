@@ -27,7 +27,8 @@ export const updateUserDynamic = async (email: string, fieldsToUpdate: Partial<{
     birthday: Date,  
     gender: string,
     phone: string,
-    avatar: string
+    avatar: string,
+    status: number
   }>) => {
     const keys = Object.keys(fieldsToUpdate);
     if (keys.length === 0) {
@@ -42,7 +43,7 @@ export const updateUserDynamic = async (email: string, fieldsToUpdate: Partial<{
   
     return result;
   };
-  
+
   
 export const deleteUser = async (email: string): Promise<any> => {
     const [results] = await db.query('DELETE FROM user WHERE email = ?', [email]);

@@ -51,7 +51,6 @@ export const loginController = async (req: Request, res: Response, next: NextFun
 
 export const createUserController = async (req: Request, res: Response) => {
     const { username, password, email, phone, birthday, avatar } = req.body;
-    console.log(`Creating user with email: ${email}, username: ${username}, phone: ${phone}, birthday: ${birthday}, avatar: ${avatar}`);
     try {
         const data = await UserService.createUser(username, password, email, phone, birthday, avatar);
         res.status(201).json(data);
@@ -66,13 +65,14 @@ export const createUserController = async (req: Request, res: Response) => {
 
 export const updateUserController = async (req: Request, res: Response) => {
     const email = req.params.email;
-    const { username, birthday, gender, phone } = req.body;
+    const { username, birthday, gender, phone, status } = req.body;
   
     const updateData: any = {};
     if (username) updateData.username = username;
     if (birthday) updateData.birthday = birthday;
     if (gender) updateData.gender = gender;
     if (phone) updateData.phone = phone;  
+    if (status) updateData.status = status;
     try {
       const result = await UserService.updateUser(email, updateData);
       res.status(200).json({ message: 'Cập nhật thành công', data: result });
