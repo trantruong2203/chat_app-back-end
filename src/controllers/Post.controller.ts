@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { createPost, deletePost, getAllPosts, getPostById, updatePost } from "../services/Post.service";
+import { getAllPostsService, getPostByIdService, createPostService, updatePostService, deletePostService } from "../services/Post.service";
 
-export const getPostsController = async (req: Request, res: Response) => {
+export const getAllPostsController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllPosts();
-        res.status(200).json(data);
+        const data = await getAllPostsService();
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
@@ -12,42 +12,40 @@ export const getPostsController = async (req: Request, res: Response) => {
 
 export const getPostByIdController = async (req: Request, res: Response) => {
     try {
-        const data = await getPostById(parseInt(req.params.id));
-        if (!data || data.length === 0) {
-            return res.status(404).json({message: "Post not found"});
-        }
-        res.status(200).json(data[0]);
+        const {id} = req.params;
+        const data = await getPostByIdService(parseInt(id));
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
-};  
+};
 
 export const createPostController = async (req: Request, res: Response) => {
-    const { id, userid, content, createdat, status } = req.body;
     try {
-        const data = await createPost(id, userid, content, createdat, status);
-        res.status(200).json(data);
+        const {userid, content, createdat, status} = req.body;
+        const data = await createPostService(userid, content, createdat, status);
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
 };
 
 export const updatePostController = async (req: Request, res: Response) => {
-    const {id} = req.params;
-    const { userid, content, createdat, status } = req.body;
     try {
-        const data = await updatePost(parseInt(id), userid, content, createdat, status);
-        res.status(201).json(data);
+        const {id} = req.params;
+        const {userid, content, status} = req.body;
+        const data = await updatePostService(parseInt(id), userid, content, status);
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
 };
 
 export const deletePostController = async (req: Request, res: Response) => {
-    const {id} = req.params;
     try {
-         const data = await deletePost(parseInt(id));
-         res.status(204).send();
+        const {id} = req.params;
+        const data = await deletePostService(parseInt(id));
+        res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }

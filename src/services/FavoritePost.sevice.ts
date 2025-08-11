@@ -1,45 +1,74 @@
-import { FavoritePost } from "../models/FavoritePost.model";
-import { db } from '../config/db';
+import { getAllFavoritePosts, getFavoritePostById, createFavoritePost, updateFavoritePostDynamic, deleteFavoritePost, countFavoritePost } from "../models/FavoritePost.model";
+import { FavoritePost } from "../types/interface";
 
-export const getAllFavoritePosts = async (): Promise<FavoritePost[]> => {
-    const [results] = await db.query('SELECT * FROM favoritepost');
-    return results as FavoritePost[];
+export const getAllFavoritePostsService = () => {
+  return new Promise((resolve, reject) => {
+    getAllFavoritePosts()
+      .then((results: FavoritePost[]) => {
+        resolve(results);
+      })
+      .catch((err: Error) => {
+        reject(err);
+      });
+  });
 };
 
-export const getFavoritePostById = async (id: number): Promise<FavoritePost[]> => {
-    const [results] = await db.query('SELECT * FROM favoritepost WHERE id = ?', [id]);
-    return results as FavoritePost[];
+export const getFavoritePostByIdService = async (id: number): Promise<FavoritePost[]> => {
+  return new Promise((resolve, reject) => {
+    getFavoritePostById(id)
+      .then((results: FavoritePost[]) => {
+        resolve(results);
+      })
+      .catch((err: Error) => {
+        reject(err);
+      });
+  });
 };
 
-export const createFavoritePost = async (id: number, userid: number, postid: number, createdat: Date, iconid: number): Promise<any> => {
-    const [results] = await db.query('INSERT INTO favoritepost (id, userid, postid, createdat, iconid) VALUES (?, ?, ?, ?, ?)', [id, userid, postid, createdat, iconid]);
-    return (
-        {
-            success: true,
-            message: 'Favorite post created successfully',
-            data: results
-        }
-    )
+export const createFavoritePostService = async (userid: number, postid: number, createdat: string, iconid: number): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await createFavoritePost(userid, postid, createdat, iconid);
+      resolve({ message: 'Favorite post created successfully', data: { userid, postid, createdat, iconid, id: results.data.insertId } });
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
-export const updateFavoritePost = async (id: number, userid: number, postid: number, createdat: Date, iconid: number): Promise<any> => {
-    const [results] = await db.query('UPDATE favoritepost SET userid = ?, postid = ?, createdat = ?, iconid = ? WHERE id = ?', [userid, postid, createdat, iconid, id]);
-    return (
-        {
-            success: true,
-            message: 'Favorite post updated successfully',
-            data: results
-        }
-    )
+export const updateFavoritePostService = async (id: number, userid: number, postid: number, createdat: string, iconid: number): Promise<any> => {
+  console.log(`Updating favorite post with ID: ${id}, UserID: ${userid}, PostID: ${postid}, CreatedAt: ${createdat}, IconID: ${iconid}`);
+  return new Promise(async (resolve, reject) => {
+    try {
+      await updateFavoritePostDynamic(id, { userid, postid, createdat, iconid });
+      resolve({ message: `Favorite post updated successfully ${id}`, data: { id, userid, postid, createdat, iconid } });
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
-export const deleteFavoritePost = async (id: number): Promise<any> => {
-    const [results] = await db.query('DELETE FROM favoritepost WHERE id = ?', [id]);
-    return (
-        {
-            success: true,
-            message: 'Favorite post deleted successfully',
-            data: results
-        }
-    )
+export const deleteFavoritePostService = async (postid: number, userid: number): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await deleteFavoritePost(postid, userid);
+      resolve({ 
+        message: 'Favorite post deleted successfully', 
+        data: { postid, userid, deletedRows: result.data.deletedRows } 
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export const countFavoritePostService = async (postid: number): Promise<number> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await countFavoritePost(postid);
+      resolve(results);
+    } catch (err) {
+      reject(err);
+    }
+  });
 };

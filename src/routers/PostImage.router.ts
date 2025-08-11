@@ -3,7 +3,7 @@ import { getAllPostImagesController, getPostImageByIdController, createPostImage
 
 const router = Router();
 
-router.get('/', getAllPostImagesController);
+router.get('/post/:postid', getAllPostImagesController);
 router.get('/:id', getPostImageByIdController);
 router.post('/', createPostImageController);
 router.put('/:id', updatePostImageController);

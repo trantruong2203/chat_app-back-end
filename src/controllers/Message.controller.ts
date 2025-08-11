@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getAllMessagesService, getMessageByIdService, createMessageService, updateMessageService, deleteMessageService } from "../services/Message.service";
+import { getAllMessagesService, getMessageByIdService, createMessageService, updateMessageService, deleteMessageService, getLastMessagesByUserIdService } from "../services/Message.service";
 
 export const getAllMessagesController = async (req: Request, res: Response) => {
     try {
@@ -50,3 +50,20 @@ export const deleteMessageController = async (req: Request, res: Response) => {
         res.status(500).json({error});
     }
 };
+
+
+
+export const getLastMessagesByUserIdController = async (req: Request, res: Response) => {
+    const userId = Number(req.query.userId); // ví dụ nhận từ query ?userId=10
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required" });
+    }
+  
+    try {
+      const messages = await getLastMessagesByUserIdService(userId); // gọi từ service hoặc model
+      return res.json(messages);
+    } catch (err) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  

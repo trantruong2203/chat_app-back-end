@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { getAllChatGroups, getChatGroupById, createChatGroup, updateChatGroup, deleteChatGroup } from "../services/ChatGroup.service";
+import { getAllChatGroupsService, getChatGroupByIdService, createChatGroupService, updateChatGroupService, deleteChatGroupService } from "../services/ChatGroup.service";
 
 export const getAllChatGroupsController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllChatGroups();
+        const data = await getAllChatGroupsService();
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -13,7 +13,7 @@ export const getAllChatGroupsController = async (req: Request, res: Response) =>
 export const getChatGroupByIdController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await getChatGroupById(parseInt(id));
+        const data = await getChatGroupByIdService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -22,8 +22,8 @@ export const getChatGroupByIdController = async (req: Request, res: Response) =>
 
 export const createChatGroupController = async (req: Request, res: Response) => {
     try {
-        const {id, name, avatar, creatorid, createdat, status} = req.body;
-        const data = await createChatGroup(parseInt(id), name, avatar, parseInt(creatorid), new Date(createdat), status);
+        const {name, avatar, creatorid, createdat, status} = req.body;
+        const data = await createChatGroupService(name, avatar, creatorid, createdat, status);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -33,8 +33,8 @@ export const createChatGroupController = async (req: Request, res: Response) => 
 export const updateChatGroupController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const {name, avatar, creatorid, createdat, status} = req.body;
-        const data = await updateChatGroup(parseInt(id), name, avatar, parseInt(creatorid), new Date(createdat), status);
+        const {name, avatar, status} = req.body;
+        const data = await updateChatGroupService(parseInt(id), name, avatar, status);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -44,7 +44,7 @@ export const updateChatGroupController = async (req: Request, res: Response) => 
 export const deleteChatGroupController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await deleteChatGroup(parseInt(id));
+        const data = await deleteChatGroupService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});

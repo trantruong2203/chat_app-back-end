@@ -1,4 +1,4 @@
-import { getAllMessages, getMessageById, createMessage, updateMessage, deleteMessage } from "../models/Message.model";
+import { getAllMessages, getMessageById, createMessage, updateMessage, deleteMessage, getLastMessagesByUserId } from "../models/Message.model";
 import { Message } from "../types/interface";
 
 export const getAllMessagesService = () => {
@@ -25,7 +25,7 @@ export const getMessageByIdService = async (id: number): Promise<Message[]> => {
       });
 };
 
-export const createMessageService = async (senderid: number, receiverid: number, groupid: number, content: string, sentat: Date, status: boolean, messageid: number): Promise<any> => {
+export const createMessageService = async (senderid: number, receiverid: number, groupid: number | null, content: string, sentat: string, status: number, messageid: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
        try {
         const results = await createMessage(senderid, receiverid, groupid, content, sentat, status, messageid);
@@ -36,7 +36,7 @@ export const createMessageService = async (senderid: number, receiverid: number,
       });
 };
 
-export const updateMessageService = async (id: number, senderid: number, receiverid: number, groupid: number, content: string, sentat: Date, status: boolean, messageid: number): Promise<any> => {
+export const updateMessageService = async (id: number, senderid: number, receiverid: number, groupid: number | null, content: string, sentat: string, status: number, messageid: number): Promise<any> => {
   console.log(`Updating message with ID: ${id}, SenderID: ${senderid}, ReceiverID: ${receiverid}, GroupID: ${groupid}, Content: ${content}, SentAt: ${sentat}, Status: ${status}, MessageID: ${messageid}`);
     return new Promise(async (resolve, reject) => {
        try {
@@ -57,4 +57,15 @@ export const deleteMessageService = async (id: number): Promise<any> => {
         reject(err);
        }
       });
+};
+
+export const getLastMessagesByUserIdService = async (userId: number): Promise<Message[]> => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const results = await getLastMessagesByUserId(userId);
+            resolve(results);
+        } catch (err) {
+            reject(err);
+        }
+    });
 };

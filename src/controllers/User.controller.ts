@@ -39,8 +39,8 @@ export const loginController = async (req: Request, res: Response, next: NextFun
         //    lưu token vào cookie
         res.cookie('token', data.token, {
             httpOnly: true,
-            secure: false,       // ⬅️ false nếu đang chạy HTTP (localhost)
-            sameSite: 'lax',     // hoặc 'none' nếu secure: true
+            secure: process.env.NODE_ENV === 'production',  // true khi production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',  // 'none' khi production
             maxAge: 2 * 60 * 60 * 1000, // 2 giờ
         });
         res.status(200).json(data.token);
@@ -65,13 +65,14 @@ export const createUserController = async (req: Request, res: Response) => {
 
 export const updateUserController = async (req: Request, res: Response) => {
     const email = req.params.email;
-    const { username, birthday, gender, phone, status } = req.body;
+    const { username, birthday, gender, phone, avatar, status } = req.body;
   
     const updateData: any = {};
     if (username) updateData.username = username;
     if (birthday) updateData.birthday = birthday;
     if (gender) updateData.gender = gender;
-    if (phone) updateData.phone = phone;  
+    if (phone) updateData.phone = phone;
+    if (avatar) updateData.avatar = avatar;
     if (status) updateData.status = status;
     try {
       const result = await UserService.updateUser(email, updateData);
@@ -106,7 +107,11 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 
 export const logoutController = async (req: Request, res: Response) => {
     try {
-        res.clearCookie('token');
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+        });
         res.status(200).json({ message: 'Đăng xuất thành công' });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi hệ thống khi đăng xuất' });

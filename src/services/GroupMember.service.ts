@@ -1,27 +1,60 @@
-import { GroupMember } from "../models/GroupMember.model";
-import { db } from "../config/db";
+import { getAllGroupMembers, getGroupMemberById, createGroupMember, updateGroupMemberDynamic, deleteGroupMember } from "../models/GroupMember.model";
+import { GroupMember } from "../types/interface";
 
-export const createGroupMember = async (id: number, groupid: number, userid: number, joinedat: Date, roleid: number): Promise<GroupMember[]> => {
-    const newGroupMember = await db.query('INSERT INTO groupmember (id, groupid, userid, joinedat, roleid) VALUES (?, ?, ?, ?, ?)', [id, groupid, userid, joinedat, roleid]);
-    return newGroupMember as unknown as GroupMember[];
+export const getAllGroupMembersService = () => {
+    return new Promise((resolve, reject) => {
+      getAllGroupMembers()
+        .then((results: GroupMember[]) => {
+          resolve(results);
+        })
+        .catch((err: Error) => {
+          reject(err);
+        });
+    });
+  };
+
+export const getGroupMemberByIdService = async (id: number): Promise<GroupMember[]> => {
+    return new Promise((resolve, reject) => {
+        getGroupMemberById(id)
+          .then((results: GroupMember[]) => {
+            resolve(results);
+          })
+          .catch((err: Error) => {
+            reject(err);
+          });
+      });
 };
 
-export const getGroupMemberById = async (id: number): Promise<GroupMember[]> => {
-    const [results] = await db.query('SELECT * FROM groupmember WHERE id = ?', [id]);
-    return results as unknown as GroupMember[];
+export const createGroupMemberService = async (groupid: number, userid: number, joinedat: Date, roleid: number): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+       try {
+        const results = await createGroupMember(groupid, userid, joinedat, roleid);
+        resolve({message: 'Group member created successfully', data: {groupid, userid, joinedat, roleid, id: results.insertId}});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };
 
-export const getGroupMembers = async (): Promise<GroupMember[]> => {
-    const [results] = await db.query('SELECT * FROM groupmember');
-    return results as unknown as GroupMember[];
+export const updateGroupMemberService = async (id: number, groupid: number, userid: number, joinedat: Date, roleid: number): Promise<any> => {
+  console.log(`Updating group member with ID: ${id}, Group ID: ${groupid}, User ID: ${userid}, Joined At: ${joinedat}, Role ID: ${roleid}`);
+    return new Promise(async (resolve, reject) => {
+       try {
+          await updateGroupMemberDynamic(id, {groupid, userid, joinedat, roleid});
+        resolve({message: `Group member updated successfully ${id}`, data : {id, groupid, userid, joinedat, roleid }});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };
 
-export const updateGroupMember = async (id: number, groupMember: GroupMember): Promise<GroupMember[]> => {
-    const [results] = await db.query('UPDATE groupmember SET groupid = ?, userid = ?, joinedat = ?, roleid = ? WHERE id = ?', [groupMember.groupid, groupMember.userid, groupMember.joinedat, groupMember.roleid, id]);
-    return results as unknown as GroupMember[];
-};
-
-export const deleteGroupMember = async (id: number): Promise<GroupMember[]> => {
-    const [results] = await db.query('DELETE FROM groupmember WHERE id = ?', [id]);
-    return results as unknown as GroupMember[];
+export const deleteGroupMemberService = async (id: number): Promise<any> => {
+    return new Promise(async (resolve, reject) => {
+       try {
+        await deleteGroupMember(id);
+        resolve({message: 'Group member deleted successfully', data: {id}});
+       } catch (err) {
+        reject(err);
+       }
+      });
 };

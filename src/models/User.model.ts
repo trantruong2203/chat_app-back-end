@@ -4,12 +4,12 @@ import { User } from "../types/interface";
 
 
 export const getAllUsers = async (): Promise<User[]> => {
-    const [results] = await db.query('SELECT * FROM user');
+    const [results] = await db.query('SELECT id, username, password, birthday, gender, phone, avatar, email, createat, CAST(status AS UNSIGNED) as status FROM user');
     return results as User[];
 };
 
 export const getUserById = async (email: string): Promise<User[]> => {
-    const [results] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+    const [results] = await db.query('SELECT id, username, password, birthday, gender, phone, avatar, email, createat, CAST(status AS UNSIGNED) as status FROM user WHERE email = ?', [email]);
     return results as User[];
 };
 

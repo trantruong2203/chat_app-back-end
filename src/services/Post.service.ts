@@ -1,44 +1,60 @@
+import { getAllPosts, getPostById, createPost, updatePostDynamic, deletePost } from "../models/Post.model";
+import { Post } from "../types/interface";
 
-import { db } from '../config/db';
-import { Post } from "../models/Post.model";
-
-export const getAllPosts = async (): Promise<Post[]> => {
-    const [results] = await db.query('SELECT * FROM post');
-    return results as Post[];
+export const getAllPostsService = () => {
+  return new Promise((resolve, reject) => {
+        getAllPosts()
+      .then((results: Post[]) => {
+        resolve(results);
+      })
+      .catch((err: Error) => {
+        reject(err);
+      });
+  });
 };
 
-export const getPostById = async (id: number): Promise<Post[]> => {
-    const [results] = await db.query('SELECT * FROM post WHERE id = ?', [id]);
-    return results as Post[];
-};
-export const createPost = async (id: number, userid: number, content: string, createdat: Date, status: boolean): Promise<any> => {
-    const [results] = await db.query('INSERT INTO post (id, userid, content, createdat, status) VALUES (?, ?, ?, ?, ?)', [id, userid, content, createdat, status]);
-    return (
-        {
-            success: true,
-            message: 'Post created successfully',
-            data: results
-        }
-    )
-};
-export const updatePost = async (id: number, userid: number, content: string, createdat: Date, status: boolean): Promise<any> => {
-    const [results] = await db.query('UPDATE post SET userid = ?, content = ?, createdat = ?, status = ? WHERE id = ?', [userid, content, createdat, status, id]);
-    return (
-        {
-            success: true,
-            message: 'Post updated successfully',
-            data: results
-        }
-    )
+export const getPostByIdService = async (id: number): Promise<Post[]> => {
+  return new Promise((resolve, reject) => {
+    getPostById(id)
+      .then((results: Post[]) => {
+        resolve(results);
+      })
+      .catch((err: Error) => {
+        reject(err);
+      });
+  });
 };
 
-export const deletePost = async (id: number): Promise<any> => {
-    const [results] = await db.query('DELETE FROM post WHERE id = ?', [id]);
-    return (
-        {
-            success: true,
-            message: 'Post deleted successfully',
-            data: results
-        }
-    )
+export const createPostService = async (userid: number, content: string, createdat: string, status: number): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await createPost(userid, content, createdat, status);
+      resolve({ message: 'Post created successfully', data: { userid, content, createdat, status, id: results.data.insertId } });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export const updatePostService = async (id: number, userid: number, content: string, status: number): Promise<any> => {
+  console.log(`Updating post with ID: ${id}, Userid: ${userid}, Content: ${content}, Status: ${status}`);
+  return new Promise(async (resolve, reject) => {
+    try {
+      await updatePostDynamic(id, { userid, content, status });
+      resolve({ message: `Post updated successfully ${id}`, data: { id, userid, content, status } });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+export const deletePostService = async (id: number): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await deletePost(id);
+      resolve({ message: 'Post deleted successfully', data: { id } });
+    } catch (err) {
+      reject(err);
+    }
+  });
 };

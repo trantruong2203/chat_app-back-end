@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { createGroupMember, deleteGroupMember, getGroupMemberById, getGroupMembers, updateGroupMember } from "../services/GroupMember.service";
+import { createGroupMemberService, deleteGroupMemberService, getGroupMemberByIdService, getAllGroupMembersService, updateGroupMemberService } from "../services/GroupMember.service";
 
 export const createGroupMemberController = async (req: Request, res: Response) => {
     try {
-        const {id, groupid, userid, joinedat, roleid} = req.body;
-        const data = await createGroupMember(parseInt(id), parseInt(groupid), parseInt(userid), new Date(joinedat), parseInt(roleid));
+        const {groupid, userid, joinedat, roleid} = req.body;
+        const data = await createGroupMemberService(parseInt(groupid), parseInt(userid), new Date(joinedat), parseInt(roleid));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -13,7 +13,7 @@ export const createGroupMemberController = async (req: Request, res: Response) =
 
 export const getGroupMemberController = async (req: Request, res: Response) => {
     try {
-        const data = await getGroupMembers();
+        const data = await getAllGroupMembersService();
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -23,7 +23,7 @@ export const getGroupMemberController = async (req: Request, res: Response) => {
 export const getGroupMemberByIdController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await getGroupMemberById(parseInt(id));
+        const data = await getGroupMemberByIdService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -34,7 +34,7 @@ export const updateGroupMemberController = async (req: Request, res: Response) =
     try {
         const {id} = req.params;
         const {groupid, userid, joinedat, roleid} = req.body;
-        const data = await updateGroupMember(parseInt(id), {id: parseInt(id), groupid, userid, joinedat, roleid});
+        const data = await updateGroupMemberService(parseInt(id), parseInt(groupid), parseInt(userid), new Date(joinedat), parseInt(roleid));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -44,7 +44,7 @@ export const updateGroupMemberController = async (req: Request, res: Response) =
 export const deleteGroupMemberController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
-        const data = await deleteGroupMember(parseInt(id));
+        const data = await deleteGroupMemberService(parseInt(id));
         res.json(data);
     } catch (error) {
         res.status(500).json({error});

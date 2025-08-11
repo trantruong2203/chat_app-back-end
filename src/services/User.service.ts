@@ -75,7 +75,7 @@ export const createUser = async (username: string, password: string, email: stri
 
 export const updateUser = async (
   email: string,
-  data: Partial<{ username: string, birthday: Date, gender: string, phone: string, status: number }>
+  data: Partial<{ username: string, birthday: Date, gender: string, phone: string,avatar: string, status: number }>
 ) => {
   return new Promise(async (resolve, reject) => {
     try {

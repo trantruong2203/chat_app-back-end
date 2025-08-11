@@ -20,7 +20,7 @@ const port = 3000;
 app.use(express.json());
 // 🧠 Cấu hình CORS cho phép gửi cookie
 app.use(cors({
-  origin: 'http://localhost:5173', // frontend domain
+  origin: ['http://localhost:5173', 'https://chat-app-front-end-43yr.vercel.app'], // frontend domain
   credentials: true
 }));
 

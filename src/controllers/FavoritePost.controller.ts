@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { createFavoritePost, deleteFavoritePost, getAllFavoritePosts, getFavoritePostById, updateFavoritePost } from "../services/FavoritePost.sevice";
+import { countFavoritePostService, createFavoritePostService, deleteFavoritePostService, getAllFavoritePostsService, getFavoritePostByIdService, updateFavoritePostService } from "../services/FavoritePost.sevice";
 
-export const getFavoritePostsController = async (req: Request, res: Response) => {
+export const getAllFavoritePostsController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllFavoritePosts();
+        const data = await getAllFavoritePostsService();
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -11,8 +11,9 @@ export const getFavoritePostsController = async (req: Request, res: Response) =>
 };
 
 export const getFavoritePostByIdController = async (req: Request, res: Response) => {
-    try {
-        const data = await getFavoritePostById(parseInt(req.params.id));
+    try {   
+        const {id} = req.params;
+        const data = await getFavoritePostByIdService(parseInt(id));
         if (!data || data.length === 0) {
             return res.status(404).json({message: "Favorite post not found"});
         }
@@ -23,9 +24,9 @@ export const getFavoritePostByIdController = async (req: Request, res: Response)
 };  
 
 export const createFavoritePostController = async (req: Request, res: Response) => {
-    const { id, userid, postid, createdat, iconid } = req.body;
+    const { userid, postid, createdat, iconid } = req.body;
     try {
-        const data = await createFavoritePost(id, userid, postid, createdat, iconid);
+        const data = await createFavoritePostService(userid, postid, createdat, iconid);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -36,7 +37,7 @@ export const updateFavoritePostController = async (req: Request, res: Response) 
     const {id} = req.params;
     const { userid, postid, createdat, iconid } = req.body;
     try {
-        const data = await updateFavoritePost(parseInt(id), userid, postid, createdat, iconid);
+        const data = await updateFavoritePostService(parseInt(id), userid, postid, createdat, iconid);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -44,10 +45,23 @@ export const updateFavoritePostController = async (req: Request, res: Response) 
 };
 
 export const deleteFavoritePostController = async (req: Request, res: Response) => {
-    const {id} = req.params;
+    const {postid, userid} = req.params;
     try {
-         const data = await deleteFavoritePost(parseInt(id));
-         res.status(204).send();
+         const data = await deleteFavoritePostService(parseInt(postid), parseInt(userid));
+         res.status(200).json(data);
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Favorite post not found') {
+            return res.status(404).json({ message: 'Favorite post not found' });
+        }
+        res.status(500).json({ error: error instanceof Error ? error.message : 'Internal server error' });
+    }
+};
+
+export const countFavoritePostController = async (req: Request, res: Response) => {
+    const {postid} = req.params;
+    try {
+         const data = await countFavoritePostService(parseInt(postid));
+         res.json(data);
     } catch (error) {
         res.status(500).json({error});
     }
