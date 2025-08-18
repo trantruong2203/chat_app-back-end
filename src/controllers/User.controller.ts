@@ -98,7 +98,7 @@ export const deleteUserController = async (req: Request, res: Response) => {
 
 export const getCurrentUser = async (req: Request, res: Response) => {
     try {
-        res.json({ user: req.user }); // lấy từ decoded token
+        res.json({ user: req.user });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi hệ thống' });
     }

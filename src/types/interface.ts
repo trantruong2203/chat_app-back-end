@@ -77,3 +77,14 @@ export interface Comment {
     commentid: number;
     createdat: Date;
 };
+
+export interface MessageSocket {
+    id: number;
+    senderid: number;
+    receiverid: number;
+    groupid: number | null;
+    content: string;
+    sentat: string;
+    status: number;
+    messageid: number;
+};

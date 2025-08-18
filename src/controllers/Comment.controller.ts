@@ -105,52 +105,56 @@ export const getCommentRepliesController = async (req: Request, res: Response) =
 };
 
 export const createCommentController = async (req: Request, res: Response) => {
-    try {
-        const { userid, postid, content, iconid, imgurl, commentid } = req.body;
-        // Validation
-        if (!userid || !postid || !content) {
-            return res.status(400).json({
-                success: false,
-                message: "userid, postid và content là bắt buộc"
-            });
-        }
-
-        if (typeof content !== 'string' || content.trim().length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Nội dung comment không được để trống"
-            });
-        }
-
-        const commentData = {
-            userid: parseInt(userid),
-            postid: parseInt(postid),
-            content: content.trim(),
-            iconid: iconid || undefined,
-            imgurl: imgurl || undefined,
-            commentid: commentid || undefined
-        };
-              console.log(commentData);
-              
-        const data = await createComment(
-            commentData.userid,
-            commentData.postid,
-            commentData.content,
-            commentData.iconid,
-            commentData.imgurl,
-            commentData.commentid
-        );
-        res.status(201).json({
-            success: true,
-            message: 'Comment được tạo thành công',
-            data: data
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error instanceof Error ? error.message : 'Unknown error occurred'
-        });
+  try {
+    const { userid, postid, content, createdat, iconid, imgurl, commentid } = req.body;
+    // Validation cơ bản
+    if (!userid || !postid) {
+      return res.status(400).json({
+        success: false,
+        message: "userid và postid là bắt buộc"
+      });
     }
+
+    // Cho phép: phải có ít nhất content (sau khi trim) hoặc imgurl
+    const hasText = typeof content === 'string' && content.trim().length > 0;
+    const hasImage = typeof imgurl === 'string' && imgurl.trim().length > 0;
+    if (!hasText && !hasImage) {
+      return res.status(400).json({
+        success: false,
+        message: "Cần có nội dung hoặc ảnh cho comment"
+      });
+    }
+
+    const commentData = {
+      userid: parseInt(userid),
+      postid: parseInt(postid),
+      content: hasText ? content.trim() : '',
+      createdat: createdat ,
+      iconid: iconid || undefined,
+      imgurl: hasImage ? imgurl : undefined,
+      commentid: commentid || undefined
+    };
+
+    const data = await createComment(
+      commentData.userid,
+      commentData.postid,
+      commentData.content,
+      commentData.createdat,
+      commentData.iconid,
+      commentData.imgurl,
+      commentData.commentid
+    );
+    res.status(201).json({
+      success: true,
+      message: 'Comment được tạo thành công',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
+  }
 };
 
 export const updateCommentController = async (req: Request, res: Response) => {

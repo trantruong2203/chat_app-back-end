@@ -43,13 +43,13 @@ export const createComment = async (
     userid: number, 
     postid: number, 
     content: string, 
+    createdat: string,
     iconid?: number,
     imgurl?: string,
     commentid?: number
 ): Promise<any> => {
     return new Promise(async (resolve, reject) => {
         try {
-            const createdat = dayjs().utc().format('YYYY-MM-DD HH:mm:ss');
             const result = await CommentModel.createComment(
             userid,
             postid,

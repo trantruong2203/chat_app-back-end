@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { getAllMessagesService, getMessageByIdService, createMessageService, updateMessageService, deleteMessageService, getLastMessagesByUserIdService } from "../services/Message.service";
+import { io } from "../server";
 
 export const getAllMessagesController = async (req: Request, res: Response) => {
     try {
@@ -24,7 +25,7 @@ export const createMessageController = async (req: Request, res: Response) => {
     try {
         const {senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
         const data = await createMessageService(senderid, receiverid, groupid, content, sentat, status, messageid);
-        res.json(data);
+        res.status(200).json({message: "Message sent successfully"});
     } catch (error) {
         res.status(500).json({error});
     }
@@ -35,6 +36,7 @@ export const updateMessageController = async (req: Request, res: Response) => {
         const {id} = req.params;
         const {senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
         const data = await updateMessageService(parseInt(id), senderid, receiverid, groupid, content, sentat, status, messageid);
+        io.emit("receiveMessage", data);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -45,6 +47,7 @@ export const deleteMessageController = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
         const data = await deleteMessageService(parseInt(id));
+        io.emit("receiveMessage", data);
         res.json(data);
     } catch (error) {
         res.status(500).json({error});
@@ -61,9 +64,10 @@ export const getLastMessagesByUserIdController = async (req: Request, res: Respo
   
     try {
       const messages = await getLastMessagesByUserIdService(userId); // gọi từ service hoặc model
+      io.emit("receiveMessage", messages);
       return res.json(messages);
     } catch (err) {
       return res.status(500).json({ error: "Internal server error" });
     }
   };
-  
+

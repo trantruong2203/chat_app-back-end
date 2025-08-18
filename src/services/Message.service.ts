@@ -37,7 +37,7 @@ export const createMessageService = async (senderid: number, receiverid: number,
 };
 
 export const updateMessageService = async (id: number, senderid: number, receiverid: number, groupid: number | null, content: string, sentat: string, status: number, messageid: number): Promise<any> => {
-  console.log(`Updating message with ID: ${id}, SenderID: ${senderid}, ReceiverID: ${receiverid}, GroupID: ${groupid}, Content: ${content}, SentAt: ${sentat}, Status: ${status}, MessageID: ${messageid}`);
+    console.log(`Updating message with ID: ${id}, SenderID: ${senderid}, ReceiverID: ${receiverid}, GroupID: ${groupid}, Content: ${content}, SentAt: ${sentat}, Status: ${status}, MessageID: ${messageid}`);
     return new Promise(async (resolve, reject) => {
        try {
           await updateMessage(id, senderid, receiverid, groupid, content, sentat, status, messageid);

@@ -25,7 +25,7 @@ export const getCommentsByPostId = async (postId: number): Promise<Comment[]> =>
         FROM comment c 
         LEFT JOIN user u ON c.userid = u.id 
         WHERE c.postid = ? 
-        ORDER BY c.createdat ASC
+        ORDER BY c.createdat DESC
     `, [postId]);
     return results as Comment[];
 };
