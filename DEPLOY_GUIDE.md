@@ -67,7 +67,7 @@ CLIENT_URL=https://your-frontend-domain.com
 - **Branch**: `main` (hoặc branch chính)
 
 **Build & Deploy:**
-- **Build Command**: `npm install && npm run build`
+- **Build Command**: `npm ci && npm run build`
 - **Start Command**: `npm run start:prod`
 - **Plan**: `Free` (để test) hoặc `Starter` ($7/tháng)
 

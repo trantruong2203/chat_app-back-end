@@ -5,7 +5,7 @@
 - [ ] **Kiểm tra code local**
   - [ok ] Chạy `npm run build` thành công
   - [ok ] Chạy `npm start` hoạt động bình thường
-  - [ ] Test API endpoints hoạt động
+  - [ok ] Test API endpoints hoạt động
 
 - [ ] **Kiểm tra dependencies**
   - [ ] `package.json` có script `build` và `start:prod`
@@ -36,7 +36,7 @@
   - [ ] Branch: `main`
 
 - [ ] **Cấu hình Build & Deploy**
-  - [ ] Build Command: `npm install && npm run build`
+  - [ ] Build Command: `npm ci && npm run build`
   - [ ] Start Command: `npm run start:prod`
   - [ ] Plan: `Free` hoặc `Starter`
 
