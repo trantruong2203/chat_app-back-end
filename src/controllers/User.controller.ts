@@ -3,6 +3,7 @@ import * as UserService from '../services/User.service';
 import { User } from "../types/interface";
 import { log } from "console";
 
+// Không cần import type declaration ở đây
 
 
 // Thêm interface cho dữ liệu đăng nhập

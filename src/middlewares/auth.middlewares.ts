@@ -1,6 +1,8 @@
 // middlewares/auth.middleware.ts
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+// Không cần import type declaration ở đây
+
 const SECRET = process.env.SECRET;
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {

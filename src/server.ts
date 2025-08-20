@@ -27,7 +27,7 @@ const port = process.env.PORT || 3000;
 const allowedOrigins = [
   'http://localhost:5173',
   process.env.CLIENT_URL,
-  'https://chat-app-front-end-43yr.vercel.app'
+  'https://chatapp-two-rust.vercel.app'
 ].filter(Boolean) as string[];
 
 // Tạo Socket.IO server
