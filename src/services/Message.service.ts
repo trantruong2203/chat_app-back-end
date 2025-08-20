@@ -25,11 +25,12 @@ export const getMessageByIdService = async (id: number): Promise<Message[]> => {
       });
 };
 
-export const createMessageService = async (senderid: number, receiverid: number, groupid: number | null, content: string, sentat: string, status: number, messageid: number): Promise<any> => {
+export const createMessageService = async (senderid: number, receiverid: number | null, groupid: number | null, content: string, sentat: string, status: number, messageid: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
        try {
-        const results = await createMessage(senderid, receiverid, groupid, content, sentat, status, messageid);
-        resolve({message: 'Message created successfully', data: {senderid, receiverid, groupid, content, sentat, status, messageid}});
+        const results = await createMessage(senderid, receiverid as any, groupid, content, sentat, status, messageid);
+        const created = Array.isArray(results) ? results[0] : results;
+        resolve({message: 'Message created successfully', data: created});
        } catch (err) {
         reject(err);
        }

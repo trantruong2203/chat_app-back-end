@@ -63,9 +63,9 @@ export const createUser = async (username: string, password: string, email: stri
         email,
         new Date()
       );
-      resolve({ message: 'Đăng ký thành công', id: result.data.insertId });
+      resolve({ message: 'Đăng ký thành công', user: (result.data && result.data[0]) || null });
     } catch (err: any) {
-      if (err.code === 'ER_DUP_ENTRY') {
+      if (err.code === 'ER_DUP_ENTRY' || err.code === '23505') {
         return reject({ status: 400, message: 'email đã tồn tại' });
       }
       return reject({ status: 500, message: 'Lỗi server khi tạo tài khoản', error: err });

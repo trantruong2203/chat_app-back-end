@@ -29,7 +29,7 @@ export const createPostService = async (userid: number, content: string, created
   return new Promise(async (resolve, reject) => {
     try {
       const results = await createPost(userid, content, createdat, status);
-      resolve({ message: 'Post created successfully', data: { userid, content, createdat, status, id: results.data.insertId } });
+      resolve({ message: 'Post created successfully', data: { userid, content, createdat, status, id: results.data?.[0]?.id } });
     } catch (err) {
       reject(err);
     }

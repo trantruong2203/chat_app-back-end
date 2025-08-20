@@ -25,18 +25,18 @@ export const getFriendShipByIdService = async (id: number): Promise<FriendShip[]
       });
 };
 
-export const createFriendShipService = async (userid: number, sentat: number, status: boolean): Promise<any> => {
+export const createFriendShipService = async (userid: number, sentat: number, status: number): Promise<any> => {
     return new Promise(async (resolve, reject) => {
        try {
         const results = await createFriendShip(userid, sentat, status);
-        resolve({message: 'Friendship created successfully', data: {userid, sentat, status, id: results.insertId}});
+        resolve({message: 'Friendship created successfully', data: {userid, sentat, status, id: results?.[0]?.id}});
        } catch (err) {
         reject(err);
        }
       });
 };
 
-export const updateFriendShipService = async (id: number, userid: number, sentat: string, status: number): Promise<any> => {
+export const updateFriendShipService = async (id: number, userid: number, sentat: number, status: number): Promise<any> => {
   console.log(`Updating friendship with ID: ${id}, UserID: ${userid}, SentAt: ${sentat}, Status: ${status}`);
     return new Promise(async (resolve, reject) => {
        try {

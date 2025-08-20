@@ -20,7 +20,7 @@ export interface User {
 export interface Message {
     id: number;
     senderid: number;
-    receiverid: number;
+    receiverid: number | null;
     groupid: number | null;
     content: string;
     sentat: string;

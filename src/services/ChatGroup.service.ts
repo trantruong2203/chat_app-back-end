@@ -29,7 +29,7 @@ export const createChatGroupService = async (name: string, avatar: string, creat
   return new Promise(async (resolve, reject) => {
     try {
       const results = await createChatGroup(name, avatar, creatorid, createdat, status);
-      resolve({ message: 'Chat group created successfully', data: { name, avatar, creatorid, createdat, status, id: results.data.insertId } });
+      resolve({ message: 'Chat group created successfully', data: { name, avatar, creatorid, createdat, status, id: results.data?.[0]?.id } });
     } catch (err) {
       reject(err);
     }

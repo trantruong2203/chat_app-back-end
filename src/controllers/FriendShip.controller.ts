@@ -28,7 +28,7 @@ export const getFriendShipByIdController = async (req: Request, res: Response) =
 export const createFriendShipController = async (req: Request, res: Response) => {
     const { userid, sentat, status } = req.body;
     try {
-        const data = await FriendShipService.createFriendShipService(parseInt(userid), parseInt(sentat), status);
+        const data = await FriendShipService.createFriendShipService(parseInt(userid), parseInt(sentat), parseInt(status));
         res.status(201).json(data);
     } catch (error) {
         res.status(500).json({error});

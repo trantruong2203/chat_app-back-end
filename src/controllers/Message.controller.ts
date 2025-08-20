@@ -24,8 +24,12 @@ export const getMessageByIdController = async (req: Request, res: Response) => {
 export const createMessageController = async (req: Request, res: Response) => {
     try {
         const {senderid, receiverid, groupid, content, sentat, status, messageid} = req.body;
-        const data = await createMessageService(senderid, receiverid, groupid, content, sentat, status, messageid);
-        res.status(200).json({message: "Message sent successfully"});
+        const result = await createMessageService(senderid, receiverid ?? null, groupid ?? null, content, sentat, status, messageid);
+        const createdMessage = result?.data;
+        if (createdMessage) {
+            io.emit("receiveMessage", createdMessage);
+        }
+        res.status(200).json(result);
     } catch (error) {
         res.status(500).json({error});
     }
@@ -64,7 +68,6 @@ export const getLastMessagesByUserIdController = async (req: Request, res: Respo
   
     try {
       const messages = await getLastMessagesByUserIdService(userId); // gọi từ service hoặc model
-      io.emit("receiveMessage", messages);
       return res.json(messages);
     } catch (err) {
       return res.status(500).json({ error: "Internal server error" });

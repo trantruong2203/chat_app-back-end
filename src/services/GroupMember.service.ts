@@ -29,7 +29,7 @@ export const createGroupMemberService = async (groupid: number, userid: number, 
     return new Promise(async (resolve, reject) => {
        try {
         const results = await createGroupMember(groupid, userid, joinedat, roleid);
-        resolve({message: 'Group member created successfully', data: {groupid, userid, joinedat, roleid, id: results.insertId}});
+        resolve({message: 'Group member created successfully', data: {groupid, userid, joinedat, roleid, id: results.data?.[0]?.id}});
        } catch (err) {
         reject(err);
        }

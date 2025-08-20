@@ -29,7 +29,7 @@ export const createFavoritePostService = async (userid: number, postid: number, 
   return new Promise(async (resolve, reject) => {
     try {
       const results = await createFavoritePost(userid, postid, createdat, iconid);
-      resolve({ message: 'Favorite post created successfully', data: { userid, postid, createdat, iconid, id: results.data.insertId } });
+      resolve({ message: 'Favorite post created successfully', data: { userid, postid, createdat, iconid, id: results.data?.[0]?.id } });
     } catch (err) {
       reject(err);
     }

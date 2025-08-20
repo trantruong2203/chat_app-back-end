@@ -18,15 +18,22 @@ import cookieParser from 'cookie-parser';
 import type { MessageSocket, User } from './types/interface';
 import { getAllMessages } from './models/Message.model';
 import { getUserByAccount } from './services/User.service';
+import 'dotenv/config';
 
 const app = express();
 const server = createServer(app);
-const port = 3000;
+const port = process.env.PORT || 3000;
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.CLIENT_URL,
+  'https://chat-app-front-end-43yr.vercel.app'
+].filter(Boolean) as string[];
 
 // Tạo Socket.IO server
 export const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'https://chat-app-front-end-43yr.vercel.app'],
+    origin: allowedOrigins,
     credentials: true
   },
 });
@@ -39,7 +46,7 @@ app.use(express.json());
 
 // 🧠 Cấu hình CORS cho phép gửi cookie
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://chat-app-front-end-43yr.vercel.app'], // frontend domain
+  origin: allowedOrigins, // frontend domain
   credentials: true
 }));
 
@@ -146,5 +153,7 @@ server.listen(port, () => {
   console.log(`🚀 Server đang chạy tại http://localhost:${port}`);
   console.log(`🔌 Socket.IO server đã sẵn sàng!`);
 });
+
+export default app;
 
 
