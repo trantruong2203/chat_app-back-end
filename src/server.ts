@@ -15,7 +15,7 @@ import postRouter from './routers/Post.router';
 import favoritePostRouter from './routers/FavoritePost.router';
 import postImageRouter from './routers/PostImage.router';
 import cookieParser from 'cookie-parser';
-import type { MessageSocket, User } from './types/interface';
+import type { MessageSocket, User, FriendShip, FriendRequestSocketEvent, FriendRequestResponse } from './types/interface';
 import { getAllMessages } from './models/Message.model';
 import { getUserByAccount } from './services/User.service';
 import 'dotenv/config';
@@ -135,6 +135,139 @@ io.on("connection", async (socket: Socket) => {
 
     });
 
+  });
+
+  socket.on("sendFriendRequest", (friendRequestData: FriendShip) => {
+    // Gửi thông báo cho người nhận lời mời
+    const targetUserId = friendRequestData.sentat.toString();
+    const senderUserId = friendRequestData.userid.toString();
+    
+    // Lấy thông tin người gửi từ onlineUsers
+    const senderData = onlineUsers.get(senderUserId);
+    
+    if (senderData) {
+      // Gửi thông báo cho người nhận lời mời
+      const eventData: FriendRequestSocketEvent = {
+        type: "new_request",
+        requestId: friendRequestData.id,
+        senderId: friendRequestData.userid,
+        senderUser: senderData.user,
+        receiverId: friendRequestData.sentat,
+        sentat: friendRequestData.sentat,
+        status: friendRequestData.status,
+        timestamp: new Date()
+      };
+      
+      io.emit("receiveFriendRequest", eventData);
+      
+      // Gửi xác nhận cho người gửi
+      const response: FriendRequestResponse = {
+        success: true,
+        message: "Đã gửi lời mời kết bạn thành công",
+        requestId: friendRequestData.id
+      };
+      
+      socket.emit("friendRequestSent", response);
+    }
+  });
+
+  socket.on("acceptFriendRequest", (friendRequestData: FriendShip) => {
+    const targetUserId = friendRequestData.userid.toString();
+    const accepterUserId = friendRequestData.sentat.toString();
+    
+    // Lấy thông tin người chấp nhận từ onlineUsers
+    const accepterData = onlineUsers.get(accepterUserId);
+    
+    if (accepterData) {
+      // Gửi thông báo cho người gửi lời mời biết đã được chấp nhận
+      const eventData: FriendRequestSocketEvent = {
+        type: "accepted",
+        requestId: friendRequestData.id,
+        senderId: friendRequestData.userid,
+        accepterId: friendRequestData.sentat,
+        accepterUser: accepterData.user,
+        sentat: friendRequestData.sentat,
+        status: friendRequestData.status,
+        timestamp: new Date()
+      };
+      
+      io.emit("friendRequestAccepted", eventData);
+      
+      // Gửi xác nhận cho người chấp nhận
+      const response: FriendRequestResponse = {
+        success: true,
+        message: "Đã chấp nhận lời mời kết bạn thành công",
+        requestId: friendRequestData.id
+      };
+      
+      socket.emit("friendRequestAccepted", response);
+    }
+  });
+
+  socket.on("rejectFriendRequest", (friendRequestData: FriendShip) => {
+    const targetUserId = friendRequestData.userid.toString();
+    const rejecterUserId = friendRequestData.sentat.toString();
+    
+    // Lấy thông tin người từ chối từ onlineUsers
+    const rejecterData = onlineUsers.get(rejecterUserId);
+    
+    if (rejecterData) {
+      // Gửi thông báo cho người gửi lời mời biết đã bị từ chối
+      const eventData: FriendRequestSocketEvent = {
+        type: "rejected",
+        requestId: friendRequestData.id,
+        senderId: friendRequestData.userid,
+        rejecterId: friendRequestData.sentat,
+        rejecterUser: rejecterData.user,
+        sentat: friendRequestData.sentat,
+        status: friendRequestData.status,
+        timestamp: new Date()
+      };
+      
+      io.emit("friendRequestRejected", eventData);
+      
+      // Gửi xác nhận cho người từ chối
+      const response: FriendRequestResponse = {
+        success: true,
+        message: "Đã từ chối lời mời kết bạn",
+        requestId: friendRequestData.id
+      };
+      
+      socket.emit("friendRequestRejected", response);
+    }
+  });
+
+  socket.on("cancelFriendRequest", (friendRequestData: FriendShip) => {
+    const targetUserId = friendRequestData.sentat.toString();
+    const cancelerUserId = friendRequestData.userid.toString();
+    
+    // Lấy thông tin người hủy từ onlineUsers
+    const cancelerData = onlineUsers.get(cancelerUserId);
+    
+    if (cancelerData) {
+      // Gửi thông báo cho người nhận lời mời biết đã bị hủy
+      const eventData: FriendRequestSocketEvent = {
+        type: "cancelled",
+        requestId: friendRequestData.id,
+        senderId: friendRequestData.userid,
+        senderUser: cancelerData.user,
+        receiverId: friendRequestData.sentat,
+        sentat: friendRequestData.sentat,
+        status: friendRequestData.status,
+        timestamp: new Date()
+      };
+      
+      io.emit("friendRequestCancelled", eventData);
+      
+      // Gửi xác nhận cho người hủy
+      const response: FriendRequestResponse = {
+        success: true,
+        message: "Đã hủy lời mời kết bạn",
+        requestId: friendRequestData.id
+      };
+      
+      socket.emit("friendRequestCancelled", response);
+    }
   });
 
   socket.on("disconnect", () => {

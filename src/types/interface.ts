@@ -88,3 +88,32 @@ export interface MessageSocket {
     status: number;
     messageid: number;
 };
+
+export interface FriendRequest {
+    id: number;
+    userid: number;
+    sentat: number;
+    status: number;
+};
+
+// Socket.IO Events Interfaces
+export interface FriendRequestSocketEvent {
+    type: "new_request" | "accepted" | "rejected" | "cancelled";
+    requestId: number;
+    senderId: number;
+    senderUser?: User;
+    receiverId?: number;
+    accepterId?: number;
+    accepterUser?: User;
+    rejecterId?: number;
+    rejecterUser?: User;
+    sentat: number;
+    status: number;
+    timestamp: Date;
+}
+
+export interface FriendRequestResponse {
+    success: boolean;
+    message: string;
+    requestId: number;
+}
